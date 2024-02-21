@@ -1,5 +1,5 @@
-import { Box, Button, Icon } from "@chakra-ui/react";
-import { Component, ComponentProps, PropsWithChildren } from "react";
+import { Button, Icon } from "@chakra-ui/react";
+import { ComponentProps, PropsWithChildren } from "react";
 import { NavLink as ReactRouterNavLink } from "react-router-dom";
 
 interface NavLinkProps {
