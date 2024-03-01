@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { logInWithEmailAndPassword, signInWithGoogle } from "../../firebase";
 import {
   Button,
   Flex,
@@ -49,7 +48,7 @@ const Login: React.FC = () => {
 
   const onSubmit: SubmitHandler<FormData> = async ({ email, password }) => {
     try {
-      await logInWithEmailAndPassword(email, password);
+      // await logInWithEmailAndPassword(email, password);
       handleSuccessfulLogin();
     } catch (error) {
       setLoginError(
@@ -60,7 +59,7 @@ const Login: React.FC = () => {
 
   const onGoogleSignIn = async () => {
     try {
-      await signInWithGoogle();
+      // await signInWithGoogle();
       handleSuccessfulLogin();
     } catch (error) {
       setLoginError(
