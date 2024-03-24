@@ -9,6 +9,7 @@ import { collections } from "./models";
 // eslint-disable-next-line no-restricted-globals
 self.addEventListener("message", async (event) => {
   const messageWrapper = JSON.parse(event.data) as MessageWrapper;
+  console.debug(`worker:${messageWrapper.message.type}:received`, messageWrapper);
   const message = messageWrapper.message;
 
   const sendResponse = <D>(data: D) => {
@@ -16,6 +17,7 @@ self.addEventListener("message", async (event) => {
       id: messageWrapper.id,
       data,
     };
+    console.debug(`worker:${message.type}:response`, responseWrapper);
     // eslint-disable-next-line no-restricted-globals
     self.postMessage(JSON.stringify(responseWrapper));
   };
@@ -25,6 +27,7 @@ self.addEventListener("message", async (event) => {
       id: messageWrapper.id,
       error,
     };
+    console.debug(`worker:${message.type}:error`, responseWrapper);
     // eslint-disable-next-line no-restricted-globals
     self.postMessage(JSON.stringify(responseWrapper));
   }
