@@ -1,7 +1,7 @@
 import { PropsOf } from "@chakra-ui/react";
 import CreatableSelect from 'react-select/creatable';
 import React from "react";
-import { Skills } from "../types";
+import { Skills } from "../service/types";
 
 type SkillsInputProps = PropsOf<typeof CreatableSelect>;
 

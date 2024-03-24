@@ -19,9 +19,11 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { BiPlusCircle } from "react-icons/bi";
+import { v4 as uuid } from "uuid";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import { Collection, Sharing } from "../../types";
+import { Collection, Sharing } from "../../service/types";
 import SkillsInput from "../../components/SkillsInput";
+import init from "../../service/init";
 
 interface EditCollectionProps {
   collection?: Collection;
@@ -44,14 +46,28 @@ const EditCollection: React.FC<EditCollectionProps> = ({ collection }) => {
     reset
   } = useForm<FormData>({
     defaultValues: {
-      name: collection?.name || "",
-      description: collection?.description || "",
-      sharing: collection?.sharing || Sharing.Private,
+      name: collection?.data.name || "",
+      description: collection?.content || "",
+      sharing: collection?.data.sharing || Sharing.Private,
     },
   });
 
-  const onSave: SubmitHandler<FormData> = (data) => {
+  const onSave: SubmitHandler<FormData> = async (data) => {
     console.log(data);
+    const {
+      collections
+    } = init();
+    await collections.upsert({
+      type: "collection",
+      content: data.description,
+      data: {
+        id: uuid(),
+        name: data.name,
+        sharing: data.sharing,
+        skills: data.skills,
+        exercises: []
+      }
+    });
     handleClose();
   };
 
