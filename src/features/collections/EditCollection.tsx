@@ -33,7 +33,7 @@ interface FormData {
   name: string;
   description: string;
   sharing: Sharing;
-  skills: string[];
+  skills: {label: string, value: string}[];
 }
 
 const EditCollection: React.FC<EditCollectionProps> = ({ collection }) => {
@@ -64,7 +64,7 @@ const EditCollection: React.FC<EditCollectionProps> = ({ collection }) => {
         id: uuid(),
         name: data.name,
         sharing: data.sharing,
-        skills: data.skills,
+        skills: data.skills.map(skill => skill.value),
         exercises: []
       }
     });

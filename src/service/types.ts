@@ -63,14 +63,14 @@ export interface MessageWrapper {
 }
 
 export interface ResponseError {
-  code: number;
+  code: string;
   message: string;
 }
 
-export interface ResponseWrapper<T> {
+export interface ResponseWrapper<T = void> {
   id: string;
   error?: ResponseError;
-  data: T;
+  data?: T;
 }
 
 export type PartialCollection = Omit<

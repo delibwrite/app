@@ -12,10 +12,10 @@ export default class Client {
     this.worker = worker;
   }
 
-  protected sendMessage<M extends Message, R = undefined>(
+  protected sendMessage<M extends Message, R = void>(
     message: M,
     { timeout = 30000 }: SendMessageOptions = {}
-  ): Promise<R> {
+  ): Promise<R | undefined> {
     const messageWrapper = {
       id: uuid(),
       message,
@@ -23,27 +23,30 @@ export default class Client {
 
     let responseListener: (event: MessageEvent) => void;
 
-    const result = new Promise<R>((resolve, reject) => {
+    const result = new Promise<R | undefined>((resolve, reject) => {
       responseListener = (event: MessageEvent) => {
-        const response = JSON.parse(event.data) as ResponseWrapper<R>;
-        if (response.id === messageWrapper.id) {
+        const responseWrapper = JSON.parse(event.data) as ResponseWrapper<R>;
+        console.debug(`client:${message.type}:response`, event);
+
+        if (responseWrapper.id === messageWrapper.id) {
           this.worker.removeEventListener("message", responseListener);
 
-          if (response.error) {
-            reject(new Error(response.error.message));
+          if (responseWrapper.error) {
+            reject(new Error(responseWrapper.error.message));
           } else {
-            resolve(response.data);
+            resolve(responseWrapper.data);
           }
         }
       };
       this.worker.addEventListener("message", responseListener);
     });
 
-    this.worker.postMessage(JSON.stringify(message));
+    console.debug(`client:${message.type}:sending`, messageWrapper)
+    this.worker.postMessage(JSON.stringify(messageWrapper));
 
     return Promise.race([
       result,
-      new Promise<R>((_, reject) => {
+      new Promise<R | undefined>((_, reject) => {
         setTimeout(() => {
           this.worker.removeEventListener("message", responseListener);
           reject(new Error("Sending message timed out"));

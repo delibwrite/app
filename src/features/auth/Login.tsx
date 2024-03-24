@@ -44,7 +44,7 @@ const Login: React.FC = () => {
         isClosable: true,
       });
     }
-  }, [loginError]);
+  }, [loginError, toast]);
 
   const onSubmit: SubmitHandler<FormData> = async ({ email, password }) => {
     try {
