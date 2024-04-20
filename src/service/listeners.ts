@@ -38,6 +38,9 @@ self.addEventListener("message", async (event) => {
         const { collection } = (message as UpsertCollectionMessage).data;
         return sendResponse(await collections.upsert(collection));
       }
+      case "collections:list": {
+        return sendResponse(await collections.list());
+      }
     }
   } catch (e) {
     sendError({ code: 'GENERIC', message: (e as Error).message });

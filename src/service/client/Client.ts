@@ -1,5 +1,5 @@
 import { v4 as uuid } from "uuid";
-import { Message, ResponseWrapper } from "./types";
+import { Message, ResponseWrapper } from "../types";
 
 interface SendMessageOptions {
   timeout?: number;

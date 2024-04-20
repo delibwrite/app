@@ -1,9 +1,13 @@
-import { Collection, PartialCollection } from '../types';
+import { Collection, ListModelItem, PartialCollection } from '../types';
 import Model from './Model';
 
 export default class Collections extends Model {
   protected getType(): string {
     return "collections";
+  }
+
+  public async list(): Promise<ListModelItem<Collection>[]> {
+    return this.listAll();
   }
 
   public get(id: string): Promise<Collection> {

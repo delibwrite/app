@@ -23,7 +23,7 @@ import { v4 as uuid } from "uuid";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { Collection, Sharing } from "../../service/types";
 import SkillsInput from "../../components/SkillsInput";
-import init from "../../service/init";
+import { useService } from "../../contexts/service";
 
 interface EditCollectionProps {
   collection?: Collection;
@@ -51,20 +51,17 @@ const EditCollection: React.FC<EditCollectionProps> = ({ collection }) => {
       sharing: collection?.data.sharing || Sharing.Private,
     },
   });
+  const { client } = useService();
 
   const onSave: SubmitHandler<FormData> = async (data) => {
-    console.log(data);
-    const {
-      collections
-    } = init();
-    await collections.upsert({
+    await client.collections.upsert({
       type: "collection",
       content: data.description,
       data: {
         id: uuid(),
         name: data.name,
         sharing: data.sharing,
-        skills: data.skills.map(skill => skill.value),
+        skills: data.skills?.map(skill => skill.value) || [],
         exercises: []
       }
     });

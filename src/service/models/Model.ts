@@ -1,5 +1,5 @@
 import * as matter from "gray-matter";
-import { ModelType } from "../types";
+import { ListModelItem, ModelType } from "../types";
 
 const parseMatter = matter.default;
 
@@ -36,6 +36,27 @@ export default abstract class Model {
       data: attributes.data,
       content,
     } as M;
+  }
+
+  protected async listAll<M extends ModelType>(): Promise<ListModelItem<M>[]> {
+    const directoryHandle = await this.getDirectoryHandle();
+    // @ts-ignore
+    const fileHandles = await directoryHandle.values();
+    const models: Omit<M, 'content'>[] = [];
+
+    for await (const fileHandle of fileHandles) {
+      const file = await fileHandle.getFile();
+      const fileContent = await file.text();
+      const { data: attributes } = parseMatter(fileContent);
+
+      models.push({
+        type: attributes.type,
+        schemaVersion: attributes.schemaVersion,
+        data: attributes.data,
+      } as Omit<M, 'content'>);
+    }
+
+    return models;
   }
 
   protected async persist(model: ModelType) {

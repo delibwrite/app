@@ -1,4 +1,5 @@
 import { ChakraProvider } from "@chakra-ui/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Route,
   RouterProvider,
@@ -9,6 +10,12 @@ import MainLayout from "./layout/MainLayout";
 import Collections from "./features/collections/Collections";
 import Login from "./features/auth/Login";
 import AuthLayout from "./layout/AuthLayout";
+import init from "./service/init";
+import ServiceProvider from "./contexts/service";
+
+const queryClient = new QueryClient();
+
+const { worker } = init();
 
 function App() {
   const router = createBrowserRouter(
@@ -27,7 +34,11 @@ function App() {
 
   return (
     <ChakraProvider>
-      <RouterProvider router={router} />
+      <QueryClientProvider client={queryClient}>
+        <ServiceProvider worker={worker}>
+          <RouterProvider router={router} />
+        </ServiceProvider>
+      </QueryClientProvider>
     </ChakraProvider>
   );
 }

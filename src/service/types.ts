@@ -7,6 +7,8 @@ export interface Model<T extends string, M extends Data> {
   content: string;
 }
 
+export type ListModelItem<M> = Omit<M, "content">;
+
 export enum Sharing {
   Private = "private",
   Public = "public",
@@ -50,7 +52,9 @@ export interface CollectionData {
 
 export type Collection = Model<"collection", CollectionData>;
 
-export type MessageType = "collections:upsert";
+export type CollectionMessageTypes = "collections:list" | "collections:upsert";
+
+export type MessageType = CollectionMessageTypes;
 
 export interface Message {
   type: MessageType;
@@ -78,11 +82,16 @@ export type PartialCollection = Omit<
   "schemaVersion"
 >;
 
-export interface UpsertCollectionMessage {
+export interface UpsertCollectionMessage extends Message {
   type: "collections:upsert";
   data: {
     collection: PartialCollection;
   };
+}
+
+export interface ListCollectionMessage extends Message {
+  type: "collections:list";
+  data: null;
 }
 
 export type ModelType = Collection | Exercise;
