@@ -21,9 +21,11 @@ import {
 import { BiPlusCircle } from "react-icons/bi";
 import { v4 as uuid } from "uuid";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import { Collection, Sharing } from "../../service/types";
+import { Collection, PartialCollection, Sharing } from "../../service/types";
 import SkillsInput from "../../components/SkillsInput";
 import { useService } from "../../contexts/service";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { QueryKeys } from "../../constants";
 
 interface EditCollectionProps {
   collection?: Collection;
@@ -33,17 +35,29 @@ interface FormData {
   name: string;
   description: string;
   sharing: Sharing;
-  skills: {label: string, value: string}[];
+  skills: { label: string; value: string }[];
 }
 
 const EditCollection: React.FC<EditCollectionProps> = ({ collection }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const queryClient = useQueryClient();
+  const { client } = useService();
+
+  const mutation = useMutation({
+    mutationFn: (collection: PartialCollection) =>
+      client.collections.upsert(collection),
+    onSuccess: () => {
+      console.log("!!!!");
+      queryClient.invalidateQueries({ queryKey: [QueryKeys.COLLECTIONS] });
+    },
+  });
+
   const {
     handleSubmit,
     register,
     formState: { errors, isSubmitting },
     control,
-    reset
+    reset,
   } = useForm<FormData>({
     defaultValues: {
       name: collection?.data.name || "",
@@ -51,19 +65,18 @@ const EditCollection: React.FC<EditCollectionProps> = ({ collection }) => {
       sharing: collection?.data.sharing || Sharing.Private,
     },
   });
-  const { client } = useService();
 
   const onSave: SubmitHandler<FormData> = async (data) => {
-    await client.collections.upsert({
+    await mutation.mutate({
       type: "collection",
       content: data.description,
       data: {
         id: uuid(),
         name: data.name,
         sharing: data.sharing,
-        skills: data.skills?.map(skill => skill.value) || [],
-        exercises: []
-      }
+        skills: data.skills?.map((skill) => skill.value) || [],
+        exercises: [],
+      },
     });
     handleClose();
   };
@@ -117,9 +130,7 @@ const EditCollection: React.FC<EditCollectionProps> = ({ collection }) => {
                   <Controller
                     control={control}
                     name="skills"
-                    render={({ field }) => (
-                      <SkillsInput {...field} />
-                    )}
+                    render={({ field }) => <SkillsInput {...field} />}
                   />
                 </FormControl>
                 <FormControl>
@@ -134,7 +145,11 @@ const EditCollection: React.FC<EditCollectionProps> = ({ collection }) => {
           </ModalBody>
 
           <ModalFooter>
-            <Button disabled={isSubmitting} variant="ghost" onClick={handleClose}>
+            <Button
+              disabled={isSubmitting}
+              variant="ghost"
+              onClick={handleClose}
+            >
               Cancel
             </Button>
             <Button

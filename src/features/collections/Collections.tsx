@@ -3,7 +3,8 @@ import { useService } from "../../contexts/service";
 import Header from "../../layout/Header";
 import EditCollection from "./EditCollection";
 import { QueryKeys } from "../../constants";
-import { Wrap } from "@chakra-ui/react";
+import { Card, CardHeader, Heading, LinkOverlay, SimpleGrid } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
 
 const Collections: React.FC = () => {
   const { client } = useService();
@@ -17,13 +18,19 @@ const Collections: React.FC = () => {
           <EditCollection />
         }
       />
-      <Wrap>
+      <SimpleGrid padding={4} spacing={4} templateColumns='repeat(auto-fill, minmax(200px, 1fr))'>
         {collections?.map(collection => (
-          <div key={collection.data.id}>
-            {collection.data.name}
-          </div>
+          <Card key={collection.data.id}>
+            <CardHeader>
+              <Heading size="sm">
+                <LinkOverlay as={Link} to={`/collections/${collection.data.id}`}>
+                  {collection.data.name}
+                </LinkOverlay>
+              </Heading>
+            </CardHeader>
+          </Card>
         ))}
-      </Wrap>
+      </SimpleGrid>
     </>
   );
 };
